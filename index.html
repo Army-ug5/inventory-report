@@ -84,6 +84,19 @@
       color: #95d5b2;
       font-weight: bold;
     }
+
+    .discord-btn {
+      display: block;
+      margin: 30px auto;
+      background: #5865f2;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+
+    .discord-btn:hover {
+      background: #4752c4;
+    }
   </style>
 </head>
 <body>
@@ -93,8 +106,8 @@
   <div class="section" id="weapons">
     <h2>🔫 Зброя</h2>
     <div class="input-row">
-      <input type="text" id="weapon-name" placeholder="Назва зброї">
-      <input type="number" id="weapon-count" placeholder="Кількість">
+      <input type="text" id="weapons-name" placeholder="Назва зброї">
+      <input type="number" id="weapons-count" placeholder="Кількість">
       <button onclick="addItem('weapons')">Додати</button>
     </div>
     <ul class="list"></ul>
@@ -124,6 +137,8 @@
   </div>
 
   <div class="grand-total">Загальний підрахунок: <span id="grand-total">0</span></div>
+
+  <button class="discord-btn" onclick="sendToDiscord()">📤 Надіслати у Discord</button>
 
   <script>
     const totals = {
@@ -159,6 +174,34 @@
     function updateGrandTotal() {
       const grand = totals.weapons + totals.ammo + totals.gear;
       document.getElementById("grand-total").textContent = grand;
+    }
+
+    async function sendToDiscord() {
+      const webhookURL = "ВСТАВ_СВІЙ_WEBHOOK_ТУТ"; // 🔹 встав сюди свій Discord Webhook
+
+      if (webhookURL.includes("ВСТАВ_СВІЙ")) {
+        alert("Спочатку встав свій Discord Webhook у коді!");
+        return;
+      }
+
+      const message = `
+**📦 Звіт по матеріалах**
+🔫 Зброя: ${totals.weapons}
+💣 Боєприпаси: ${totals.ammo}
+🎒 Спорядження: ${totals.gear}
+🧮 Разом: ${totals.weapons + totals.ammo + totals.gear}
+      `;
+
+      try {
+        await fetch(webhookURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: message })
+        });
+        alert("✅ Дані успішно відправлено у Discord!");
+      } catch (error) {
+        alert("❌ Помилка відправлення: " + error.message);
+      }
     }
   </script>
 
