@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Система підрахунку матеріалів</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #0d3b2e, #2d6a4f);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .section {
+      background: #ffffff15;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      margin-bottom: 25px;
+    }
+
+    .section h2 {
+      color: #b9fbc0;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"], input[type="number"] {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      width: 100%;
+    }
+
+    button {
+      background: #52b788;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #40916c;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      background: #ffffff22;
+      padding: 8px;
+      margin-bottom: 5px;
+      border-radius: 6px;
+    }
+
+    .total {
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #d8f3dc;
+    }
+
+    .grand-total {
+      text-align: center;
+      font-size: 22px;
+      margin-top: 30px;
+      color: #95d5b2;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📦 Система підрахунку матеріалів</h1>
+
+  <div class="section" id="weapons">
+    <h2>🔫 Зброя</h2>
+    <div class="input-row">
+      <input type="text" id="weapon-name" placeholder="Назва зброї">
+      <input type="number" id="weapon-count" placeholder="Кількість">
+      <button onclick="addItem('weapons')">Додати</button>
+    </div>
+    <ul class="list"></ul>
+    <div class="total">Разом: <span>0</span></div>
+  </div>
+
+  <div class="section" id="ammo">
+    <h2>💣 Боєприпаси</h2>
+    <div class="input-row">
+      <input type="text" id="ammo-name" placeholder="Тип боєприпасів">
+      <input type="number" id="ammo-count" placeholder="Кількість">
+      <button onclick="addItem('ammo')">Додати</button>
+    </div>
+    <ul class="list"></ul>
+    <div class="total">Разом: <span>0</span></div>
+  </div>
+
+  <div class="section" id="gear">
+    <h2>🎒 Спорядження</h2>
+    <div class="input-row">
+      <input type="text" id="gear-name" placeholder="Назва спорядження">
+      <input type="number" id="gear-count" placeholder="Кількість">
+      <button onclick="addItem('gear')">Додати</button>
+    </div>
+    <ul class="list"></ul>
+    <div class="total">Разом: <span>0</span></div>
+  </div>
+
+  <div class="grand-total">Загальний підрахунок: <span id="grand-total">0</span></div>
+
+  <script>
+    const totals = {
+      weapons: 0,
+      ammo: 0,
+      gear: 0
+    };
+
+    function addItem(sectionId) {
+      const nameInput = document.getElementById(`${sectionId}-name`);
+      const countInput = document.getElementById(`${sectionId}-count`);
+      const list = document.querySelector(`#${sectionId} .list`);
+      const totalDisplay = document.querySelector(`#${sectionId} .total span`);
+
+      const name = nameInput.value.trim();
+      const count = parseInt(countInput.value);
+
+      if (!name || isNaN(count) || count <= 0) return alert("Введи коректні дані!");
+
+      const li = document.createElement("li");
+      li.textContent = `${name} — ${count}`;
+      list.appendChild(li);
+
+      totals[sectionId] += count;
+      totalDisplay.textContent = totals[sectionId];
+
+      nameInput.value = "";
+      countInput.value = "";
+
+      updateGrandTotal();
+    }
+
+    function updateGrandTotal() {
+      const grand = totals.weapons + totals.ammo + totals.gear;
+      document.getElementById("grand-total").textContent = grand;
+    }
+  </script>
+
+</body>
+</html>
