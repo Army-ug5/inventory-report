@@ -1,1 +1,833 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UKRAINE GTA V - Система звітування</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
+        body {
+            background: linear-gradient(135deg, #1a1f2b, #2d3748);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            color: #ffd93d;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Початковий екран */
+        #start-screen {
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 500px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .start-title {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #ffd93d;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ffd93d;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            outline: 2px solid #3498db;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 15px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover {
+            background: #219652;
+            transform: translateY(-2px);
+        }
+
+        .start-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Основний інтерфейс */
+        #main-interface {
+            display: none;
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-details {
+            font-size: 1.1em;
+        }
+
+        .user-details span {
+            color: #ffd93d;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #e74c3c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .item-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .item-card.selected {
+            background: rgba(231, 76, 60, 0.15);
+            border-color: #e74c3c;
+            transform: translateY(-2px);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .item-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffd93d;
+        }
+
+        .item-cost {
+            background: #27ae60;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quantity-select {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            min-width: 80px;
+        }
+
+        .quantity-select option {
+            background: #2d3748;
+            color: white;
+        }
+
+        .select-btn {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .select-btn:hover {
+            background: #2980b9;
+        }
+
+        .remove-btn {
+            padding: 8px 16px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .summary {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .summary h2 {
+            color: #ffd93d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .selected-items {
+            margin-bottom: 25px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-title {
+            font-weight: bold;
+            color: #ffd93d;
+        }
+
+        .item-details {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .total-card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-top: 4px solid #27ae60;
+        }
+
+        .total-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .total-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .send-btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 15px 40px;
+            background: #9b59b6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: #8e44ad;
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .section-total {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            color: #ffd93d;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.success {
+            background: #27ae60;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Початковий екран -->
+    <div id="start-screen">
+        <div class="start-title">UKRAINE GTA V</div>
+        <div class="input-group">
+            <label for="nickname">Nickname:</label>
+            <input type="text" id="nickname" placeholder="Введіть ваш нікнейм" maxlength="50">
+        </div>
+        <div class="input-group">
+            <label for="static-id">Static ID:</label>
+            <input type="text" id="static-id" placeholder="Введіть ваш Static ID" maxlength="50">
+        </div>
+        <button class="start-btn" onclick="startApplication()" id="start-btn" disabled>Почати роботу</button>
+    </div>
+
+    <!-- Основний інтерфейс -->
+    <div id="main-interface" class="container">
+        <h1>UKRAINE GTA V - Система звітування матеріалів Army</h1>
+        
+        <div class="user-info">
+            <div class="user-details">
+                Користувач: <span id="display-nickname">-</span> | Static ID: <span id="display-static-id">-</span>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('weapons')">🔫 Зброя</button>
+            <button class="tab-btn" onclick="switchTab('ammo')">💣 Боєприпаси</button>
+            <button class="tab-btn" onclick="switchTab('gear')">🎒 Спорядження</button>
+        </div>
+
+        <!-- Зброя -->
+        <div id="weapons" class="tab-content active">
+            <div class="items-grid" id="weapons-grid">
+                <!-- Зброя буде додана через JavaScript -->
+            </div>
+        </div>
+
+        <!-- Боєприпаси -->
+        <div id="ammo" class="tab-content">
+            <div class="items-grid" id="ammo-grid">
+                <!-- Боєприпаси будуть додані через JavaScript -->
+            </div>
+        </div>
+
+        <!-- Спорядження -->
+        <div id="gear" class="tab-content">
+            <div class="items-grid" id="gear-grid">
+                <!-- Спорядження буде додане через JavaScript -->
+            </div>
+        </div>
+
+        <!-- Підсумок -->
+        <div class="summary">
+            <h2>📊 Загальний підрахунок матеріалів</h2>
+            
+            <div class="selected-items" id="selected-items">
+                <div class="empty-message">Оберіть предмети з вищевказаних розділів</div>
+            </div>
+
+            <div class="section-total">
+                Загальна вартість: <span id="grand-total">0</span> матеріалів
+            </div>
+
+            <div class="totals-grid">
+                <div class="total-card">
+                    <div class="total-label">🔫 Зброя</div>
+                    <div class="total-value" id="total-weapons">0</div>
+                </div>
+                <div class="total-card">
+                    <div class="total-label">💣 Боєприпаси</div>
+                    <div class="total-value" id="total-ammo">0</div>
+                </div>
+                <div class="total-card">
+                    <div class="total-label">🎒 Спорядження</div>
+                    <div class="total-value" id="total-gear">0</div>
+                </div>
+                <div class="total-card">
+                    <div class="total-label">📦 Всього предметів</div>
+                    <div class="total-value" id="total-items">0</div>
+                </div>
+            </div>
+
+            <button class="send-btn" onclick="sendToDiscord()" id="send-btn" disabled>📤 Надіслати звіт</button>
+        </div>
+
+        <!-- Текст в футері -->
+        <div class="footer-text">
+            UKRAINE GTA V - Система звітування матеріалів Army //created Danil Perets
+        </div>
+    </div>
+
+    <script>
+        // Discord Webhook URL
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1432930860012666938/8wA2vUkepF2X_nCZCuceMjxAo_DoC1GlnyyT1sYGfXCzdMLIdU7xxOe6Su_gcqoczEgZ";
+
+        // Дані предметів
+        const itemsData = {
+            weapons: [
+                { name: "Carbine Rifle", cost: 150 },
+                { name: "Combat Pistol", cost: 50 },
+                { name: "Heavy Pistol", cost: 75 },
+                { name: "Поліцейский кийок", cost: 50 },
+                { name: "Assault Shotgun", cost: 130 },
+                { name: "Sniper Rifle", cost: 200 },
+                { name: "Stun Gun", cost: 150 },
+                { name: "Assault SMG", cost: 150 },
+                { name: "Military Rifle", cost: 280 }
+            ],
+            ammo: [
+                { name: "9mm (32шт)", cost: 50 },
+                { name: "7.62mm (64шт)", cost: 75 },
+                { name: "5.56mm (32шт)", cost: 100 }
+            ],
+            gear: [
+                { name: "Бронежилет", cost: 100 },
+                { name: "Форма", cost: 300 },
+                { name: "Сухпайок", cost: 50 },
+                { name: "Мала аптечка", cost: 25 },
+                { name: "Кайданки", cost: 100 },
+                { name: "Парашут", cost: 150 }
+            ]
+        };
+
+        let selectedItems = [];
+        let sectionTotals = { weapons: 0, ammo: 0, gear: 0 };
+        let userData = { nickname: '', staticId: '' };
+
+        // Ініціалізація
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('nickname').addEventListener('input', checkStartConditions);
+            document.getElementById('static-id').addEventListener('input', checkStartConditions);
+            initializeItems();
+            updateSummary();
+        });
+
+        function checkStartConditions() {
+            const nickname = document.getElementById('nickname').value.trim();
+            const staticId = document.getElementById('static-id').value.trim();
+            const startBtn = document.getElementById('start-btn');
+            startBtn.disabled = !(nickname && staticId);
+        }
+
+        function startApplication() {
+            const nickname = document.getElementById('nickname').value.trim();
+            const staticId = document.getElementById('static-id').value.trim();
+            
+            if (!nickname || !staticId) {
+                showNotification('Будь ласка, заповніть всі поля', 'error');
+                return;
+            }
+            
+            userData = { nickname, staticId };
+            document.getElementById('display-nickname').textContent = nickname;
+            document.getElementById('display-static-id').textContent = staticId;
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('main-interface').style.display = 'block';
+            showNotification('Вхід успішний!', 'success');
+        }
+
+        function initializeItems() {
+            const weaponsGrid = document.getElementById('weapons-grid');
+            itemsData.weapons.forEach((item, index) => {
+                weaponsGrid.appendChild(createItemCard(item, 'weapons', index));
+            });
+
+            const ammoGrid = document.getElementById('ammo-grid');
+            itemsData.ammo.forEach((item, index) => {
+                ammoGrid.appendChild(createItemCard(item, 'ammo', index));
+            });
+
+            const gearGrid = document.getElementById('gear-grid');
+            itemsData.gear.forEach((item, index) => {
+                gearGrid.appendChild(createItemCard(item, 'gear', index));
+            });
+        }
+
+        function createItemCard(item, category, index) {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.id = `${category}-${index}`;
+            
+            card.innerHTML = `
+                <div class="item-header">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-cost">${item.cost} матеріалів</div>
+                </div>
+                <div class="item-controls">
+                    <select class="quantity-select" id="quantity-${category}-${index}">
+                        ${Array.from({length: 10}, (_, i) => 
+                            `<option value="${i + 1}">${i + 1} шт.</option>`
+                        ).join('')}
+                    </select>
+                    <button class="select-btn" onclick="addItem('${category}', ${index})">✅ Обрати</button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function addItem(category, index) {
+            const item = itemsData[category][index];
+            const quantitySelect = document.getElementById(`quantity-${category}-${index}`);
+            const quantity = parseInt(quantitySelect.value);
+            
+            const existingIndex = selectedItems.findIndex(selected => 
+                selected.category === category && selected.index === index
+            );
+            
+            if (existingIndex === -1) {
+                const selectedItem = {
+                    ...item,
+                    category: category,
+                    index: index,
+                    quantity: quantity,
+                    totalCost: item.cost * quantity
+                };
+                
+                selectedItems.push(selectedItem);
+                const card = document.getElementById(`${category}-${index}`);
+                card.classList.add('selected');
+                card.querySelector('.select-btn').style.display = 'none';
+                card.querySelector('.item-controls').innerHTML += `
+                    <button class="remove-btn" onclick="removeItem('${category}', ${index})">❌ Видалити</button>
+                `;
+            }
+            
+            updateSummary();
+        }
+
+        function removeItem(category, index) {
+            selectedItems = selectedItems.filter(item => 
+                !(item.category === category && item.index === index)
+            );
+            const card = document.getElementById(`${category}-${index}`);
+            card.classList.remove('selected');
+            const item = itemsData[category][index];
+            card.querySelector('.item-controls').innerHTML = `
+                <select class="quantity-select" id="quantity-${category}-${index}">
+                    ${Array.from({length: 10}, (_, i) => 
+                        `<option value="${i + 1}">${i + 1} шт.</option>`
+                    ).join('')}
+                </select>
+                <button class="select-btn" onclick="addItem('${category}', ${index})">✅ Обрати</button>
+            `;
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const selectedContainer = document.getElementById('selected-items');
+            const grandTotalElement = document.getElementById('grand-total');
+            const sendBtn = document.getElementById('send-btn');
+            
+            selectedContainer.innerHTML = '';
+            
+            if (selectedItems.length === 0) {
+                selectedContainer.innerHTML = '<div class="empty-message">Оберіть предмети з вищевказаних розділів</div>';
+                sendBtn.disabled = true;
+            } else {
+                sectionTotals = { weapons: 0, ammo: 0, gear: 0 };
+                let totalItems = 0;
+                let grandTotal = 0;
+                
+                selectedItems.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'selected-item';
+                    itemElement.innerHTML = `
+                        <div class="item-info">
+                            <div class="item-title">${item.name}</div>
+                            <div class="item-details">${item.quantity} шт. × ${item.cost} матеріалів = ${item.totalCost} матеріалів</div>
+                        </div>
+                        <button class="remove-btn" onclick="removeItem('${item.category}', ${item.index})">❌</button>
+                    `;
+                    selectedContainer.appendChild(itemElement);
+                    
+                    sectionTotals[item.category] += item.totalCost;
+                    totalItems += item.quantity;
+                    grandTotal += item.totalCost;
+                });
+                
+                document.getElementById('total-weapons').textContent = sectionTotals.weapons;
+                document.getElementById('total-ammo').textContent = sectionTotals.ammo;
+                document.getElementById('total-gear').textContent = sectionTotals.gear;
+                document.getElementById('total-items').textContent = totalItems;
+                grandTotalElement.textContent = grandTotal;
+                sendBtn.disabled = false;
+            }
+        }
+
+        function getCurrentDate() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        async function sendToDiscord() {
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = '⏳ Відправляється...';
+
+            try {
+                const currentDate = getCurrentDate();
+                const totalMaterials = sectionTotals.weapons + sectionTotals.ammo + sectionTotals.gear;
+
+                const message = {
+                    embeds: [{
+                        title: "📝 Звітність U.S ARMY",
+                        color: 0x0056b3,
+                        fields: [
+                            {
+                                name: "🔍 Нікнейм",
+                                value: userData.nickname,
+                                inline: true
+                            },
+                            {
+                                name: "📎 Static ID",
+                                value: userData.staticId,
+                                inline: true
+                            },
+                            {
+                                name: "📎 Дата звіту",
+                                value: currentDate,
+                                inline: true
+                            }
+                        ],
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                // Додаємо зброю як окреме поле, якщо є
+                const weaponsText = formatItemsByCategory('weapons');
+                if (weaponsText) {
+                    message.embeds[0].fields.push({
+                        name: "🔫 Зброя",
+                        value: weaponsText,
+                        inline: false
+                    });
+                }
+
+                // Додаємо боєприпаси як окреме поле, якщо є
+                const ammoText = formatItemsByCategory('ammo');
+                if (ammoText) {
+                    message.embeds[0].fields.push({
+                        name: "💣 Боєприпаси",
+                        value: ammoText,
+                        inline: false
+                    });
+                }
+
+                // Додаємо спорядження як окреме поле, якщо є
+                const gearText = formatItemsByCategory('gear');
+                if (gearText) {
+                    message.embeds[0].fields.push({
+                        name: "🎒 Спорядження",
+                        value: gearText,
+                        inline: false
+                    });
+                }
+
+                // Додаємо підсумок
+                message.embeds[0].fields.push({
+                    name: "📌 Підсумок",
+                    value: `■ ${totalMaterials} матеріалів`,
+                    inline: false
+                });
+
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(message)
+                });
+
+                if (response.ok) {
+                    showNotification('✅ Звіт успішно відправлено в Discord!', 'success');
+                    resetAll();
+                } else {
+                    throw new Error('Помилка відправки');
+                }
+
+            } catch (error) {
+                showNotification('❌ Помилка відправки: ' + error.message, 'error');
+            } finally {
+                sendBtn.textContent = '📤 Надіслати звіт';
+                updateSummary();
+            }
+        }
+
+        function formatItemsByCategory(category) {
+            const categoryItems = selectedItems.filter(item => item.category === category);
+            if (categoryItems.length === 0) return '';
+            return categoryItems.map(item => 
+                `■ ${item.name} - ${item.quantity}шт. - ${item.totalCost} матеріалів`
+            ).join('\n');
+        }
+
+        function resetAll() {
+            selectedItems.forEach(item => {
+                removeItem(item.category, item.index);
+            });
+            selectedItems = [];
+            updateSummary();
+            showNotification('Всі дані очищено', 'success');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
